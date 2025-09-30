@@ -8,19 +8,19 @@ import { isValidEvmAddress } from "@/utils/validation";
 const Card = styled.div`
   width: 100%;
   max-width: 580px;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
   background: linear-gradient(
     135deg,
-    rgba(30, 41, 59, 0.85) 0%,
-    rgba(15, 23, 42, 0.9) 100%
+    rgba(30, 41, 59, 0.15) 0%,
+    rgba(15, 23, 42, 0.2) 100%
   );
   border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1.5px solid rgba(148, 163, 184, 0.5);
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-    0 2px 40px rgba(59, 130, 246, 0.15);
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 2px 40px rgba(59, 130, 246, 0.3);
   padding: 40px;
   position: relative;
   z-index: 10;
@@ -37,9 +37,9 @@ const Card = styled.div`
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(59, 130, 246, 0.5) 20%,
-      rgba(147, 51, 234, 0.5) 50%,
-      rgba(59, 130, 246, 0.5) 80%,
+      rgba(59, 130, 246, 0.8) 20%,
+      rgba(147, 51, 234, 0.8) 50%,
+      rgba(59, 130, 246, 0.8) 80%,
       transparent
     );
   }

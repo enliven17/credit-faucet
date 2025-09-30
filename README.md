@@ -100,11 +100,14 @@ src/
 ## 🔒 Security Features
 
 - ✅ IP-based rate limiting (5 requests per minute)
+- ✅ **1 hour cooldown per IP address**
+- ✅ **1 hour cooldown per wallet address**
 - ✅ EVM address validation
 - ✅ Amount clamping and sanitization
 - ✅ Private key stored securely in environment variables
 - ✅ Transaction error handling
 - ✅ Input sanitization
+- ✅ Time remaining displayed when cooldown active
 
 ## 🎨 Design Features
 
