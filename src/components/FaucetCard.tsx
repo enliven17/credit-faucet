@@ -341,8 +341,8 @@ export function FaucetCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Request failed");
-      const shortHash = data.hash ? `${data.hash.slice(0, 10)}...${data.hash.slice(-8)}` : '';
-      setSuccess(`Successfully sent! Tx: ${shortHash}`);
+      setTxHash(data.hash);
+      setSuccess("Transaction successful!");
     } catch (e: any) {
       setError(e?.message || "Unexpected error occurred");
     } finally {
@@ -409,7 +409,31 @@ export function FaucetCard() {
       </Row>
 
       {error && <MessageBox type="error">{error}</MessageBox>}
-      {success && <MessageBox type="success">{success}</MessageBox>}
+      {success && (
+        <MessageBox type="success">
+          <div>
+            {success}
+            {txHash && (
+              <>
+                <br />
+                <a 
+                  href={`${CREDITCOIN_TESTNET.explorer}tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: '#86efac',
+                    textDecoration: 'underline',
+                    fontSize: '13px',
+                    wordBreak: 'break-all'
+                  }}
+                >
+                  View on Explorer ↗
+                </a>
+              </>
+            )}
+          </div>
+        </MessageBox>
+      )}
       
       <Footer>
         Built by{' '}
