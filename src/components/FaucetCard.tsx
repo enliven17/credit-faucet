@@ -85,12 +85,6 @@ const NetworkBadge = styled.div`
   }
 `;
 
-const Subtitle = styled.p`
-  margin: 0 0 ${({ theme }) => theme.spacing(3)} 0;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 14px;
-`;
-
 const Field = styled.div`
   display: grid;
   gap: 10px;
@@ -107,10 +101,6 @@ const Label = styled.label`
   color: #cbd5e1;
   letter-spacing: 0.2px;
   font-family: var(--font-inter), system-ui, sans-serif;
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
 `;
 
 const Input = styled.input`
@@ -343,8 +333,9 @@ export function FaucetCard() {
       if (!res.ok) throw new Error(data?.error || "Request failed");
       setTxHash(data.hash);
       setSuccess("Transaction successful!");
-    } catch (e: any) {
-      setError(e?.message || "Unexpected error occurred");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Unexpected error occurred";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

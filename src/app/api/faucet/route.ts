@@ -114,14 +114,15 @@ export async function POST(req: NextRequest) {
         explorer: `${CREDITCOIN_TESTNET.explorer}tx/${tx.hash}`,
         status: receipt?.status,
       });
-    } catch (txError: any) {
+    } catch (txError: unknown) {
       // If transaction fails, remove the cooldown
       delete ipCooldowns[ip];
       delete addressCooldowns[to.toLowerCase()];
       throw txError;
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || "Unexpected error" }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unexpected error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 

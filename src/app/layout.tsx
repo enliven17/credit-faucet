@@ -14,7 +14,11 @@ export const metadata: Metadata = {
   title: "Creditcoin Testnet Faucet",
   description: "Get Creditcoin Testnet (CTC) tokens for development and testing. Modern, secure faucet with 1-hour cooldown.",
   icons: {
-    icon: '/favicon.ico?v=1',
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    shortcut: '/favicon.ico',
   },
 };
 
@@ -25,6 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} style={{ margin: 0, padding: 0, background: "#0a1224" }}>
+      <head>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </head>
       <body style={{ margin: 0, padding: 0, background: "#0a1224", fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
         <Providers>
           {children}
