@@ -12,7 +12,7 @@ export async function GET() {
 
     console.log('Checking follow status for user:', session.user.twitterId);
 
-    // Basit yaklaşım: Kullanıcının takip ettiği hesapları listele
+    // Twitter API v2 ile takip kontrolü
     const response = await fetch(
       `https://api.twitter.com/2/users/${session.user.twitterId}/following?max_results=1000&user.fields=username`,
       {
