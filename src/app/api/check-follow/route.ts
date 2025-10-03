@@ -10,9 +10,11 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Önce Creditcoin'in user ID'sini alalım
-    const creditcoinResponse = await fetch(
-      `https://api.twitter.com/2/users/by/username/Creditcoin`,
+    console.log('Checking follow status for user:', session.user.twitterId);
+
+    // Basit yaklaşım: Kullanıcının takip ettiği hesapları listele
+    const response = await fetch(
+      `https://api.twitter.com/2/users/${session.user.twitterId}/following?max_results=1000&user.fields=username`,
       {
         headers: {
           Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
@@ -20,43 +22,38 @@ export async function GET() {
       }
     );
 
-    if (!creditcoinResponse.ok) {
-      throw new Error("Failed to get Creditcoin user info");
+    console.log('Twitter API response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Twitter API error:', errorText);
+      
+      // API hatası durumunda varsayılan olarak false döndür
+      return NextResponse.json({ 
+        isFollowing: false, 
+        error: "Could not verify follow status" 
+      });
     }
 
-    const creditcoinData = await creditcoinResponse.json();
-    const creditcoinId = creditcoinData.data?.id;
+    const data = await response.json();
+    console.log('Twitter API response data:', JSON.stringify(data, null, 2));
 
-    if (!creditcoinId) {
-      throw new Error("Creditcoin user not found");
-    }
+    // Creditcoin hesabını ara (büyük/küçük harf duyarsız)
+    const isFollowing = data.data?.some(
+      (user: { username: string }) => 
+        user.username.toLowerCase() === "creditcoin"
+    ) || false;
 
-    // Şimdi takip durumunu kontrol edelim
-    const followResponse = await fetch(
-      `https://api.twitter.com/2/users/${session.user.twitterId}/following/${creditcoinId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-        },
-      }
-    );
-
-    // 200 = takip ediyor, 404 = takip etmiyor
-    const isFollowing = followResponse.ok;
-
-    console.log('Follow check:', {
-      userId: session.user.twitterId,
-      creditcoinId,
-      followResponseStatus: followResponse.status,
-      isFollowing
-    });
+    console.log('Follow check result:', isFollowing);
 
     return NextResponse.json({ isFollowing });
   } catch (error) {
     console.error("Follow check error:", error);
-    return NextResponse.json(
-      { error: "Failed to check follow status" },
-      { status: 500 }
-    );
+    
+    // Hata durumunda varsayılan olarak false döndür
+    return NextResponse.json({ 
+      isFollowing: false, 
+      error: "Failed to check follow status" 
+    });
   }
 }
