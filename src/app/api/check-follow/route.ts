@@ -10,9 +10,9 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Twitter API v2 ile takip kontrolü
-    const response = await fetch(
-      `https://api.twitter.com/2/users/${session.user.twitterId}/following?user.fields=username`,
+    // Önce Creditcoin'in user ID'sini alalım
+    const creditcoinResponse = await fetch(
+      `https://api.twitter.com/2/users/by/username/Creditcoin`,
       {
         headers: {
           Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
@@ -20,14 +20,36 @@ export async function GET() {
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Twitter API error");
+    if (!creditcoinResponse.ok) {
+      throw new Error("Failed to get Creditcoin user info");
     }
 
-    const data = await response.json();
-    const isFollowing = data.data?.some(
-      (user: { username: string }) => user.username.toLowerCase() === "creditcoin"
+    const creditcoinData = await creditcoinResponse.json();
+    const creditcoinId = creditcoinData.data?.id;
+
+    if (!creditcoinId) {
+      throw new Error("Creditcoin user not found");
+    }
+
+    // Şimdi takip durumunu kontrol edelim
+    const followResponse = await fetch(
+      `https://api.twitter.com/2/users/${session.user.twitterId}/following/${creditcoinId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+        },
+      }
     );
+
+    // 200 = takip ediyor, 404 = takip etmiyor
+    const isFollowing = followResponse.ok;
+
+    console.log('Follow check:', {
+      userId: session.user.twitterId,
+      creditcoinId,
+      followResponseStatus: followResponse.status,
+      isFollowing
+    });
 
     return NextResponse.json({ isFollowing });
   } catch (error) {

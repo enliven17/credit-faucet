@@ -538,23 +538,42 @@ export function FaucetCard() {
                 Checking follow status...
               </p>
             ) : (
-              <FollowStatus isFollowing={isFollowing === true}>
-                {isFollowing === true ? (
-                  "✓ Following @Creditcoin"
-                ) : (
-                  <>
-                    Not following @Creditcoin -{' '}
-                    <a 
-                      href="https://twitter.com/Creditcoin" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ color: 'inherit', textDecoration: 'underline' }}
-                    >
-                      Follow Now
-                    </a>
-                  </>
+              <div>
+                <FollowStatus isFollowing={isFollowing === true}>
+                  {isFollowing === true ? (
+                    "✓ Following @Creditcoin"
+                  ) : (
+                    <>
+                      Not following @Creditcoin -{' '}
+                      <a 
+                        href="https://twitter.com/Creditcoin" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ color: 'inherit', textDecoration: 'underline' }}
+                      >
+                        Follow Now
+                      </a>
+                    </>
+                  )}
+                </FollowStatus>
+                {isFollowing === false && (
+                  <button
+                    onClick={checkFollowStatus}
+                    style={{
+                      marginTop: '8px',
+                      padding: '4px 12px',
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '8px',
+                      color: '#93c5fd',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Refresh Status
+                  </button>
                 )}
-              </FollowStatus>
+              </div>
             )}
           </div>
         )}
