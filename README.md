@@ -10,6 +10,7 @@ A modern, secure faucet application for distributing Creditcoin Testnet tokens (
 
 - 🎨 **Modern UI** - Beautiful glassmorphism design with animated background
 - 🔐 **Secure** - Rate limiting, input validation, and secure transaction handling
+- 🐦 **Twitter OAuth** - Login with Twitter and follow @Creditcoin requirement
 - ⚡ **Fast** - Built with Next.js 15 and optimized for performance
 - 📱 **Responsive** - Works perfectly on desktop and mobile
 - 🌐 **Web3 Ready** - Full Ethereum/EVM integration with ethers.js
@@ -39,6 +40,15 @@ npm install
 ```bash
 # .env.local
 FAUCET_PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
+
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret-key-here
+
+# Twitter OAuth (X Developer Portal'dan alın)
+TWITTER_CLIENT_ID=your-twitter-client-id
+TWITTER_CLIENT_SECRET=your-twitter-client-secret
+TWITTER_BEARER_TOKEN=your-twitter-bearer-token
 ```
 
 ⚠️ **Security Warning:** Never commit your `.env.local` file or share your private key!
@@ -63,11 +73,22 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ## 📖 Usage
 
-1. Enter a valid EVM wallet address (0x...)
-2. Enter the amount of CTC to request (max 1000 CTC)
-3. Click "Request CTC"
-4. Transaction will be sent and confirmed
-5. View transaction on Blockscout explorer
+1. **Twitter ile Giriş Yap** - Twitter hesabınızla giriş yapın
+2. **@Creditcoin Takip Et** - Faucet kullanmak için @Creditcoin hesabını takip etmelisiniz
+3. **Wallet Adresi Girin** - Geçerli bir EVM wallet adresi (0x...) girin
+4. **Miktar Belirleyin** - İstediğiniz CTC miktarını girin (max 1000 CTC)
+5. **Request CTC** - Butona tıklayın
+6. **İşlem Tamamlandı** - Transaction gönderilir ve onaylanır
+7. **Explorer'da Görüntüle** - Blockscout explorer'da işlemi görüntüleyin
+
+## 🐦 Twitter OAuth Kurulumu
+
+1. [X Developer Portal](https://developer.twitter.com/)'a gidin
+2. Yeni bir uygulama oluşturun
+3. OAuth 2.0 ayarlarını yapılandırın:
+   - **Callback URL:** `https://your-domain.com/api/auth/callback/twitter`
+   - **Website URL:** `https://your-domain.com`
+4. API anahtarlarınızı `.env` dosyasına ekleyin
 
 ## 🛠 Tech Stack
 
@@ -99,6 +120,8 @@ src/
 
 ## 🔒 Security Features
 
+- ✅ **Twitter OAuth Authentication** - Kullanıcılar Twitter ile giriş yapmalı
+- ✅ **@Creditcoin Follow Requirement** - Faucet kullanmak için takip şartı
 - ✅ IP-based rate limiting (5 requests per minute)
 - ✅ **1 hour cooldown per IP address**
 - ✅ **1 hour cooldown per wallet address**

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import styled from "styled-components";
 import { CREDITCOIN_TESTNET, FAUCET } from "@/constants/creditcoin";
 import { isValidEvmAddress } from "@/utils/validation";
@@ -157,11 +158,15 @@ const ButtonGroup = styled.div`
   gap: 10px;
 `;
 
-const Button = styled.button`
+const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   height: 52px;
   min-width: 160px;
   padding: 0 32px;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: ${({ variant }) => 
+    variant === 'secondary' 
+      ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
+      : 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+  };
   border: none;
   border-radius: 14px;
   color: white;
@@ -172,7 +177,11 @@ const Button = styled.button`
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  box-shadow: ${({ variant }) => 
+    variant === 'secondary' 
+      ? '0 4px 20px rgba(220, 38, 38, 0.4)'
+      : '0 4px 20px rgba(59, 130, 246, 0.4)'
+  };
   white-space: nowrap;
   
   &::before {
@@ -188,7 +197,11 @@ const Button = styled.button`
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 30px rgba(59, 130, 246, 0.5);
+    box-shadow: ${({ variant }) => 
+      variant === 'secondary' 
+        ? '0 6px 30px rgba(220, 38, 38, 0.5)'
+        : '0 6px 30px rgba(59, 130, 246, 0.5)'
+    };
     
     &::before {
       left: 100%;
@@ -203,11 +216,95 @@ const Button = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+    box-shadow: ${({ variant }) => 
+      variant === 'secondary' 
+        ? '0 4px 20px rgba(220, 38, 38, 0.2)'
+        : '0 4px 20px rgba(59, 130, 246, 0.2)'
+    };
   }
   
   @media (max-width: 640px) {
     width: 100%;
+  }
+`;
+
+const AuthSection = styled.div`
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  text-align: center;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  
+  @media (max-width: 640px) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
+
+const UserDetails = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+  }
+`;
+
+const UserText = styled.div`
+  text-align: left;
+  
+  .name {
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 14px;
+  }
+  
+  .username {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+`;
+
+const FollowStatus = styled.div<{ isFollowing: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: ${({ isFollowing }) => 
+    isFollowing 
+      ? 'rgba(34, 197, 94, 0.1)' 
+      : 'rgba(239, 68, 68, 0.1)'
+  };
+  border: 1px solid ${({ isFollowing }) => 
+    isFollowing 
+      ? 'rgba(34, 197, 94, 0.3)' 
+      : 'rgba(239, 68, 68, 0.3)'
+  };
+  color: ${({ isFollowing }) => 
+    isFollowing 
+      ? '#86efac' 
+      : '#fca5a5'
+  };
+  
+  &::before {
+    content: ${({ isFollowing }) => isFollowing ? "'✓'" : "'×'"};
+    font-size: 16px;
   }
 `;
 
@@ -298,17 +395,50 @@ const Footer = styled.div`
 `;
 
 export function FaucetCard() {
+  const { data: session, status } = useSession();
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("100");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
+  const [checkingFollow, setCheckingFollow] = useState(false);
+
+  useEffect(() => {
+    if (session?.user?.twitterId) {
+      checkFollowStatus();
+    }
+  }, [session]);
+
+  async function checkFollowStatus() {
+    setCheckingFollow(true);
+    try {
+      const response = await fetch('/api/check-follow');
+      const data = await response.json();
+      setIsFollowing(data.isFollowing);
+    } catch (error) {
+      console.error('Failed to check follow status:', error);
+    } finally {
+      setCheckingFollow(false);
+    }
+  }
 
   async function requestFunds() {
     setError(null);
     setSuccess(null);
     setTxHash(null);
+    
+    if (!session) {
+      setError("Please login with Twitter first");
+      return;
+    }
+    
+    if (isFollowing === false) {
+      setError("You must follow @Creditcoin on Twitter to use the faucet");
+      return;
+    }
+    
     if (!isValidEvmAddress(address)) {
       setError("Invalid EVM address");
       return;
@@ -341,6 +471,32 @@ export function FaucetCard() {
     }
   }
 
+  if (status === "loading") {
+    return (
+      <Card>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div className="spinner" />
+          <p style={{ marginTop: '16px', color: '#94a3b8' }}>Loading...</p>
+          <style jsx>{`
+            .spinner {
+              width: 32px;
+              height: 32px;
+              border: 3px solid rgba(59, 130, 246, 0.1);
+              border-top-color: #3b82f6;
+              border-radius: 50%;
+              animation: spin 0.8s linear infinite;
+              margin: 0 auto;
+            }
+            
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Title>Creditcoin Testnet Faucet</Title>
@@ -348,6 +504,61 @@ export function FaucetCard() {
       <NetworkBadge>
         {CREDITCOIN_TESTNET.name} • Chain {CREDITCOIN_TESTNET.chainId}
       </NetworkBadge>
+
+      <AuthSection>
+        {!session ? (
+          <div>
+            <p style={{ marginBottom: '16px', color: '#cbd5e1', fontSize: '14px' }}>
+              Sign in with Twitter and follow @Creditcoin to use the faucet
+            </p>
+            <Button onClick={() => signIn('twitter')}>
+              Sign in with Twitter
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <UserInfo>
+              <UserDetails>
+                {session.user?.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={session.user.image} alt="Profile" />
+                )}
+                <UserText>
+                  <div className="name">{session.user?.name}</div>
+                  <div className="username">@{session.user?.username}</div>
+                </UserText>
+              </UserDetails>
+              <Button variant="secondary" onClick={() => signOut()}>
+                Sign Out
+              </Button>
+            </UserInfo>
+            
+            {checkingFollow ? (
+              <p style={{ color: '#94a3b8', fontSize: '13px' }}>
+                Checking follow status...
+              </p>
+            ) : (
+              <FollowStatus isFollowing={isFollowing === true}>
+                {isFollowing === true ? (
+                  "✓ Following @Creditcoin"
+                ) : (
+                  <>
+                    Not following @Creditcoin -{' '}
+                    <a 
+                      href="https://twitter.com/Creditcoin" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ color: 'inherit', textDecoration: 'underline' }}
+                    >
+                      Follow Now
+                    </a>
+                  </>
+                )}
+              </FollowStatus>
+            )}
+          </div>
+        )}
+      </AuthSection>
 
       <Field>
         <Label>Wallet Address (EVM)</Label>
@@ -393,7 +604,10 @@ export function FaucetCard() {
         </InputGroup>
         <ButtonGroup>
           <Label style={{ opacity: 0, pointerEvents: 'none' }}>_</Label>
-          <Button onClick={requestFunds} disabled={loading}>
+          <Button 
+            onClick={requestFunds} 
+            disabled={loading || !session || isFollowing === false}
+          >
             {loading ? "Sending..." : `Request ${CREDITCOIN_TESTNET.symbol}`}
           </Button>
         </ButtonGroup>
