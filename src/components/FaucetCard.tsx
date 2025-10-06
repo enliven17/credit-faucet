@@ -278,35 +278,7 @@ const UserText = styled.div`
   }
 `;
 
-const FollowStatus = styled.div<{ isFollowing: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  background: ${({ isFollowing }) => 
-    isFollowing 
-      ? 'rgba(34, 197, 94, 0.1)' 
-      : 'rgba(239, 68, 68, 0.1)'
-  };
-  border: 1px solid ${({ isFollowing }) => 
-    isFollowing 
-      ? 'rgba(34, 197, 94, 0.3)' 
-      : 'rgba(239, 68, 68, 0.3)'
-  };
-  color: ${({ isFollowing }) => 
-    isFollowing 
-      ? '#86efac' 
-      : '#fca5a5'
-  };
-  
-  &::before {
-    content: ${({ isFollowing }) => isFollowing ? "'✓'" : "'×'"};
-    font-size: 16px;
-  }
-`;
+
 
 const Helper = styled.div`
   font-size: 12px;
@@ -402,27 +374,7 @@ export function FaucetCard() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
-  const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
-  const [checkingFollow, setCheckingFollow] = useState(false);
 
-  useEffect(() => {
-    if (session?.user?.twitterId) {
-      checkFollowStatus();
-    }
-  }, [session]);
-
-  async function checkFollowStatus() {
-    setCheckingFollow(true);
-    try {
-      const response = await fetch('/api/check-follow');
-      const data = await response.json();
-      setIsFollowing(data.isFollowing);
-    } catch (error) {
-      console.error('Failed to check follow status:', error);
-    } finally {
-      setCheckingFollow(false);
-    }
-  }
 
   async function requestFunds() {
     setError(null);
@@ -431,11 +383,6 @@ export function FaucetCard() {
     
     if (!session) {
       setError("Please login with Twitter first");
-      return;
-    }
-    
-    if (isFollowing === false) {
-      setError("You must follow @Creditcoin on Twitter to use the faucet");
       return;
     }
     
@@ -533,48 +480,35 @@ export function FaucetCard() {
               </Button>
             </UserInfo>
             
-            {checkingFollow ? (
-              <p style={{ color: '#94a3b8', fontSize: '13px' }}>
-                Checking follow status...
-              </p>
-            ) : (
-              <div>
-                <FollowStatus isFollowing={isFollowing === true}>
-                  {isFollowing === true ? (
-                    "✓ Following @Creditcoin"
-                  ) : (
-                    <>
-                      Not following @Creditcoin -{' '}
-                      <a 
-                        href="https://twitter.com/Creditcoin" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ color: 'inherit', textDecoration: 'underline' }}
-                      >
-                        Follow Now
-                      </a>
-                    </>
-                  )}
-                </FollowStatus>
-                {isFollowing === false && (
-                  <button
-                    onClick={checkFollowStatus}
-                    style={{
-                      marginTop: '8px',
-                      padding: '4px 12px',
-                      background: 'rgba(59, 130, 246, 0.1)',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      borderRadius: '8px',
-                      color: '#93c5fd',
-                      fontSize: '12px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Refresh Status
-                  </button>
-                )}
-              </div>
-            )}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              padding: '8px 16px',
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              borderRadius: '12px',
+              fontSize: '13px',
+              color: '#93c5fd'
+            }}>
+              <span>💡</span>
+              <span>
+                Consider following{' '}
+                <a 
+                  href="https://twitter.com/Creditcoin" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: '#60a5fa', 
+                    textDecoration: 'underline',
+                    fontWeight: '600'
+                  }}
+                >
+                  @Creditcoin
+                </a>
+                {' '}for updates!
+              </span>
+            </div>
           </div>
         )}
       </AuthSection>
@@ -625,7 +559,7 @@ export function FaucetCard() {
           <Label style={{ opacity: 0, pointerEvents: 'none' }}>_</Label>
           <Button 
             onClick={requestFunds} 
-            disabled={loading || !session || isFollowing === false}
+            disabled={loading || !session}
           >
             {loading ? "Sending..." : `Request ${CREDITCOIN_TESTNET.symbol}`}
           </Button>

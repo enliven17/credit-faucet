@@ -66,28 +66,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Twitter authentication required" }, { status: 401 });
     }
 
-    // Check if user follows @Creditcoin
-    const followResponse = await fetch(
-      `https://api.twitter.com/2/users/${session.user.twitterId}/following?user.fields=username`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
-        },
-      }
-    );
-
-    if (followResponse.ok) {
-      const followData = await followResponse.json();
-      const isFollowing = followData.data?.some(
-        (user: { username: string }) => user.username.toLowerCase() === "creditcoin"
-      );
-
-      if (!isFollowing) {
-        return NextResponse.json({ 
-          error: "You must follow @Creditcoin on Twitter to use the faucet" 
-        }, { status: 403 });
-      }
-    }
+    // Geçici: Twitter API sorunları nedeniyle takip kontrolü devre dışı
+    // Sadece Twitter authentication yeterli
+    console.log('Faucet request from authenticated Twitter user:', session.user.username);
 
     const ip = req.headers.get("x-forwarded-for") || "unknown";
     if (isRateLimited(ip)) {
