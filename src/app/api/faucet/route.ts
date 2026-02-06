@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { CREDITCOIN_TESTNET, FAUCET } from "@/constants/creditcoin";
 import { isValidEvmAddress, clampAmount } from "@/utils/validation";
 
@@ -26,19 +24,19 @@ function isRateLimited(ip: string): boolean {
 
 function checkCooldown(ip: string, address: string): { allowed: boolean; remainingMs?: number } {
   const now = Date.now();
-  
+
   // Check IP cooldown
   const ipLastRequest = ipCooldowns[ip];
   if (ipLastRequest && now - ipLastRequest < COOLDOWN_MS) {
     return { allowed: false, remainingMs: COOLDOWN_MS - (now - ipLastRequest) };
   }
-  
+
   // Check address cooldown
   const addressLastRequest = addressCooldowns[address.toLowerCase()];
   if (addressLastRequest && now - addressLastRequest < COOLDOWN_MS) {
     return { allowed: false, remainingMs: COOLDOWN_MS - (now - addressLastRequest) };
   }
-  
+
   return { allowed: true };
 }
 
@@ -60,16 +58,7 @@ function formatRemainingTime(ms: number): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.twitterId) {
-      return NextResponse.json({ error: "Twitter authentication required" }, { status: 401 });
-    }
-
-    // Geçici: Twitter API sorunları nedeniyle takip kontrolü devre dışı
-    // Sadece Twitter authentication yeterli
-    console.log('Faucet request from authenticated Twitter user:', session.user.username);
-
+    // IP and address based rate limiting and cooldown will still apply
     const ip = req.headers.get("x-forwarded-for") || "unknown";
     if (isRateLimited(ip)) {
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
@@ -87,7 +76,7 @@ export async function POST(req: NextRequest) {
     const cooldownCheck = checkCooldown(ip, to);
     if (!cooldownCheck.allowed) {
       const timeRemaining = formatRemainingTime(cooldownCheck.remainingMs!);
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: `Please wait ${timeRemaining} before requesting again`,
         cooldown: true,
         remainingMs: cooldownCheck.remainingMs

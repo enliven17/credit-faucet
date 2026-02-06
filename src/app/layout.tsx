@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/theme/providers";
-import SessionProvider from "@/components/SessionProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,11 +34,9 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
       <body style={{ margin: 0, padding: 0, background: "#0a1224", fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
-        <SessionProvider>
-          <Providers>
-            {children}
-          </Providers>
-        </SessionProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

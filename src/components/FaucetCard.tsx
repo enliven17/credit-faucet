@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useState } from "react";
 import styled from "styled-components";
 import { CREDITCOIN_TESTNET, FAUCET } from "@/constants/creditcoin";
 import { isValidEvmAddress } from "@/utils/validation";
@@ -162,8 +161,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   height: 52px;
   min-width: 160px;
   padding: 0 32px;
-  background: ${({ variant }) => 
-    variant === 'secondary' 
+  background: ${({ variant }) =>
+    variant === 'secondary'
       ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
       : 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
   };
@@ -177,8 +176,8 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: ${({ variant }) => 
-    variant === 'secondary' 
+  box-shadow: ${({ variant }) =>
+    variant === 'secondary'
       ? '0 4px 20px rgba(220, 38, 38, 0.4)'
       : '0 4px 20px rgba(59, 130, 246, 0.4)'
   };
@@ -197,11 +196,11 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${({ variant }) => 
-      variant === 'secondary' 
-        ? '0 6px 30px rgba(220, 38, 38, 0.5)'
-        : '0 6px 30px rgba(59, 130, 246, 0.5)'
-    };
+    box-shadow: ${({ variant }) =>
+    variant === 'secondary'
+      ? '0 6px 30px rgba(220, 38, 38, 0.5)'
+      : '0 6px 30px rgba(59, 130, 246, 0.5)'
+  };
     
     &::before {
       left: 100%;
@@ -216,11 +215,11 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
-    box-shadow: ${({ variant }) => 
-      variant === 'secondary' 
-        ? '0 4px 20px rgba(220, 38, 38, 0.2)'
-        : '0 4px 20px rgba(59, 130, 246, 0.2)'
-    };
+    box-shadow: ${({ variant }) =>
+    variant === 'secondary'
+      ? '0 4px 20px rgba(220, 38, 38, 0.2)'
+      : '0 4px 20px rgba(59, 130, 246, 0.2)'
+  };
   }
   
   @media (max-width: 640px) {
@@ -236,49 +235,6 @@ const AuthSection = styled.div`
   border-radius: 16px;
   text-align: center;
 `;
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-  
-  @media (max-width: 640px) {
-    flex-direction: column;
-    text-align: center;
-  }
-`;
-
-const UserDetails = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  
-  img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid rgba(59, 130, 246, 0.3);
-  }
-`;
-
-const UserText = styled.div`
-  text-align: left;
-  
-  .name {
-    font-weight: 600;
-    color: #f1f5f9;
-    font-size: 14px;
-  }
-  
-  .username {
-    font-size: 12px;
-    color: #94a3b8;
-  }
-`;
-
-
 
 const Helper = styled.div`
   font-size: 12px;
@@ -367,7 +323,6 @@ const Footer = styled.div`
 `;
 
 export function FaucetCard() {
-  const { data: session, status } = useSession();
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("100");
   const [loading, setLoading] = useState(false);
@@ -375,17 +330,11 @@ export function FaucetCard() {
   const [success, setSuccess] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
-
   async function requestFunds() {
     setError(null);
     setSuccess(null);
     setTxHash(null);
-    
-    if (!session) {
-      setError("Please login with Twitter first");
-      return;
-    }
-    
+
     if (!isValidEvmAddress(address)) {
       setError("Invalid EVM address");
       return;
@@ -418,99 +367,33 @@ export function FaucetCard() {
     }
   }
 
-  if (status === "loading") {
-    return (
-      <Card>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <div className="spinner" />
-          <p style={{ marginTop: '16px', color: '#94a3b8' }}>Loading...</p>
-          <style jsx>{`
-            .spinner {
-              width: 32px;
-              height: 32px;
-              border: 3px solid rgba(59, 130, 246, 0.1);
-              border-top-color: #3b82f6;
-              border-radius: 50%;
-              animation: spin 0.8s linear infinite;
-              margin: 0 auto;
-            }
-            
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <Title>Creditcoin Testnet Faucet</Title>
-      
+
       <NetworkBadge>
         {CREDITCOIN_TESTNET.name} • Chain {CREDITCOIN_TESTNET.chainId}
       </NetworkBadge>
 
       <AuthSection>
-        {!session ? (
-          <div>
-            <p style={{ marginBottom: '16px', color: '#cbd5e1', fontSize: '14px' }}>
-              Sign in with Twitter and follow @Creditcoin to use the faucet
-            </p>
-            <Button onClick={() => signIn('twitter')}>
-              Sign in with Twitter
+        <div>
+          <p style={{ marginBottom: '16px', color: '#cbd5e1', fontSize: '14px' }}>
+            Follow @Creditcoin on X to stay updated!
+          </p>
+          <a
+            href="https://x.com/Creditcoin"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none', display: 'inline-block', width: '100%' }}
+          >
+            <Button as="div" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.25 2.25h6.634l4.717 6.237L18.244 2.25zM17.083 19.77h1.833L7.084 4.126H5.117L17.083 19.77z" />
+              </svg>
+              Follow Creditcoin
             </Button>
-          </div>
-        ) : (
-          <div>
-            <UserInfo>
-              <UserDetails>
-                {session.user?.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={session.user.image} alt="Profile" />
-                )}
-                <UserText>
-                  <div className="name">{session.user?.name}</div>
-                  <div className="username">@{session.user?.username}</div>
-                </UserText>
-              </UserDetails>
-              <Button variant="secondary" onClick={() => signOut()}>
-                Sign Out
-              </Button>
-            </UserInfo>
-            
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px',
-              padding: '8px 16px',
-              background: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              borderRadius: '12px',
-              fontSize: '13px',
-              color: '#93c5fd'
-            }}>
-              <span>💡</span>
-              <span>
-                Consider following{' '}
-                <a 
-                  href="https://twitter.com/Creditcoin" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ 
-                    color: '#60a5fa', 
-                    textDecoration: 'underline',
-                    fontWeight: '600'
-                  }}
-                >
-                  @Creditcoin
-                </a>
-                {' '}for updates!
-              </span>
-            </div>
-          </div>
-        )}
+          </a>
+        </div>
       </AuthSection>
 
       <Field>
@@ -522,17 +405,15 @@ export function FaucetCard() {
         />
         <Helper>
           <span>Explorer:</span>
-          <a 
-            href={CREDITCOIN_TESTNET.explorer} 
-            target="_blank" 
+          <a
+            href={CREDITCOIN_TESTNET.explorer}
+            target="_blank"
             rel="noopener noreferrer"
-            style={{ 
-              color: '#60a5fa', 
+            style={{
+              color: '#60a5fa',
               textDecoration: 'none',
               transition: 'color 0.2s ease'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#93c5fd'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#60a5fa'}
           >
             {CREDITCOIN_TESTNET.explorer}
           </a>
@@ -557,9 +438,9 @@ export function FaucetCard() {
         </InputGroup>
         <ButtonGroup>
           <Label style={{ opacity: 0, pointerEvents: 'none' }}>_</Label>
-          <Button 
-            onClick={requestFunds} 
-            disabled={loading || !session}
+          <Button
+            onClick={requestFunds}
+            disabled={loading}
           >
             {loading ? "Sending..." : `Request ${CREDITCOIN_TESTNET.symbol}`}
           </Button>
@@ -574,7 +455,7 @@ export function FaucetCard() {
             {txHash && (
               <>
                 <br />
-                <a 
+                <a
                   href={`${CREDITCOIN_TESTNET.explorer}tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -592,12 +473,12 @@ export function FaucetCard() {
           </div>
         </MessageBox>
       )}
-      
+
       <Footer>
         Built by{' '}
-        <a 
-          href="https://github.com/enliven17" 
-          target="_blank" 
+        <a
+          href="https://github.com/enliven17"
+          target="_blank"
           rel="noopener noreferrer"
         >
           enliven
@@ -611,7 +492,3 @@ export function FaucetCard() {
 }
 
 export default FaucetCard;
-
-
-
-
