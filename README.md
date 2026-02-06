@@ -1,67 +1,72 @@
-# Creditcoin Testnet Faucet 🚰
+# Creditcoin Testnet Faucet
 
-A modern, secure faucet application for distributing Creditcoin Testnet tokens (CTC) to developers and testers.
+A faucet application for distributing Creditcoin Testnet tokens (CTC) to developers and testers.
 
-![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![Ethers.js](https://img.shields.io/badge/Ethers.js-v6-purple)
+## Features
 
-## ✨ Features
+- Modern Interface: Glassmorphism design with animated background components.
+- Security: Rate limiting, input validation, and transaction handling.
+- Social Connection: Direct link to follow @Creditcoin on X.
+- Performance: Built with Next.js 16 and optimized for fast execution.
+- Responsiveness: Designed for desktop and mobile environments.
+- Web3 Integration: Ethereum/EVM integration via ethers.js.
 
-- 🎨 **Modern UI** - Beautiful glassmorphism design with animated background
-- 🔐 **Secure** - Rate limiting, input validation, and secure transaction handling
-- 🐦 **Twitter OAuth** - Login with Twitter and follow @Creditcoin requirement
-- ⚡ **Fast** - Built with Next.js 15 and optimized for performance
-- 📱 **Responsive** - Works perfectly on desktop and mobile
-- 🌐 **Web3 Ready** - Full Ethereum/EVM integration with ethers.js
+## System Workflow
 
-## 🚀 Quick Start
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant Blockchain
+    
+    User->>Frontend: Enter Wallet Address & Amount
+    User->>Frontend: Click Request CTC
+    Frontend->>API: POST /api/faucet {address, amount}
+    API->>API: Validate EVM Address
+    API->>API: Check Cooldown (IP & Wallet)
+    API->>Blockchain: Send Transaction (ethers.js)
+    Blockchain-->>API: Transaction Receipt
+    API-->>Frontend: Success Response (Tx Hash)
+    Frontend-->>User: Display Success & Explorer Link
+```
+
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 18+ and npm
 - A wallet with CTC on Creditcoin Testnet
-- The private key of that wallet
+- The private key for the faucet wallet
 
 ### Installation
 
-1. **Clone the repository:**
+1. Clone the repository:
 ```bash
 git clone https://github.com/enliven17/credit-faucet.git
 cd credit-faucet
 ```
 
-2. **Install dependencies:**
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. **Create `.env.local` file:**
+3. Create .env file:
 ```bash
-# .env.local
+# .env
 FAUCET_PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
-
-# NextAuth Configuration
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret-key-here
-
-# Twitter OAuth (X Developer Portal'dan alın)
-TWITTER_CLIENT_ID=your-twitter-client-id
-TWITTER_CLIENT_SECRET=your-twitter-client-secret
-TWITTER_BEARER_TOKEN=your-twitter-bearer-token
 ```
 
-⚠️ **Security Warning:** Never commit your `.env.local` file or share your private key!
-
-4. **Run the development server:**
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-5. **Open your browser:**
-Visit [http://localhost:3000](http://localhost:3000)
+5. Access the application:
+Visit http://localhost:3000
 
-## 🌐 Creditcoin Testnet Details
+## Creditcoin Testnet Details
 
 | Property | Value |
 |----------|-------|
@@ -71,81 +76,70 @@ Visit [http://localhost:3000](http://localhost:3000)
 | Currency Symbol | CTC |
 | Block Explorer | https://creditcoin-testnet.blockscout.com/ |
 
-## 📖 Usage
+## Application Architecture
 
-1. **Twitter ile Giriş Yap** - Twitter hesabınızla giriş yapın
-2. **@Creditcoin Takip Et** - Faucet kullanmak için @Creditcoin hesabını takip etmelisiniz
-3. **Wallet Adresi Girin** - Geçerli bir EVM wallet adresi (0x...) girin
-4. **Miktar Belirleyin** - İstediğiniz CTC miktarını girin (max 1000 CTC)
-5. **Request CTC** - Butona tıklayın
-6. **İşlem Tamamlandı** - Transaction gönderilir ve onaylanır
-7. **Explorer'da Görüntüle** - Blockscout explorer'da işlemi görüntüleyin
+```mermaid
+graph TD
+    A[Root Layout] --> B[Home Page]
+    B --> C[Animated Background]
+    B --> D[Faucet Card]
+    D --> E[Input Validation]
+    D --> F[API Route: /api/faucet]
+    F --> G[Ethers Project]
+    G --> H[Creditcoin Testnet]
+```
 
-## 🐦 Twitter OAuth Kurulumu
+## Usage
 
-1. [X Developer Portal](https://developer.twitter.com/)'a gidin
-2. Yeni bir uygulama oluşturun
-3. OAuth 2.0 ayarlarını yapılandırın:
-   - **Callback URL:** `https://your-domain.com/api/auth/callback/twitter`
-   - **Website URL:** `https://your-domain.com`
-4. API anahtarlarınızı `.env` dosyasına ekleyin
+1. Follow Creditcoin: Use the follow link to stay updated on project news.
+2. Enter Wallet Address: Provide a valid EVM wallet address.
+3. Set Amount: Specify the amount of CTC required (within maximum limits).
+4. Request CTC: Execute the transaction.
+5. Verification: View the transaction status on the Blockscout explorer.
 
-## 🛠 Tech Stack
+## Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
-- **Language:** TypeScript
-- **Styling:** Styled Components + Tailwind CSS
-- **Blockchain:** Ethers.js v6
-- **Fonts:** Inter (Google Fonts)
-- **Animation:** Custom WebGL shader
+- Framework: Next.js 16 (App Router)
+- Language: TypeScript
+- Styling: Styled Components + Tailwind CSS
+- Blockchain: Ethers.js v6
+- Typography: Inter (Google Fonts)
+- Animation: Custom WebGL shader
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── api/faucet/route.ts    # API endpoint for sending CTC
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Home page
+│   ├── api/faucet/route.ts    # Request handling and validation
+│   ├── layout.tsx              # Application structure
+│   └── page.tsx                # Main entry point
 ├── components/
-│   ├── AnimatedBackground.tsx  # WebGL background
-│   ├── FaucetCard.tsx          # Main faucet UI
-│   └── ui/                     # UI components
+│   ├── AnimatedBackground.tsx  # Shader implementation
+│   ├── FaucetCard.tsx          # Interface logic
+│   └── ui/                     # Shared components
 ├── constants/
-│   └── creditcoin.ts           # Network configuration
+│   └── creditcoin.ts           # Chain parameters
 ├── utils/
-│   └── validation.ts           # Input validation
-└── theme/                      # Styling configuration
+│   └── validation.ts           # Validation logic
+└── theme/                      # Styling definitions
 ```
 
-## 🔒 Security Features
+## Security Implementation
 
-- ✅ **Twitter OAuth Authentication** - Kullanıcılar Twitter ile giriş yapmalı
-- ✅ **@Creditcoin Follow Requirement** - Faucet kullanmak için takip şartı
-- ✅ IP-based rate limiting (5 requests per minute)
-- ✅ **1 hour cooldown per IP address**
-- ✅ **1 hour cooldown per wallet address**
-- ✅ EVM address validation
-- ✅ Amount clamping and sanitization
-- ✅ Private key stored securely in environment variables
-- ✅ Transaction error handling
-- ✅ Input sanitization
-- ✅ Time remaining displayed when cooldown active
+- IP-based rate limiting (5 requests per window)
+- 1-hour cooldown period per IP address
+- 1-hour cooldown period per wallet address
+- EVM address format validation
+- Transaction amount clamping
+- Secure environment variable storage for private keys
+- Error handling for blockchain network issues
 
-## 🎨 Design Features
+## API Reference
 
-- Glassmorphism card design
-- Animated dithering shader background
-- Smooth loading states
-- Hover effects and transitions
-- Modern Inter font
-- Responsive layout
+### POST /api/faucet
 
-## 📝 API Documentation
-
-### POST `/api/faucet`
-
-**Request:**
+Request:
 ```json
 {
   "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
@@ -153,7 +147,7 @@ src/
 }
 ```
 
-**Success Response:**
+Success Response:
 ```json
 {
   "ok": true,
@@ -163,40 +157,40 @@ src/
 }
 ```
 
-**Error Response:**
+Error Response:
 ```json
 {
   "error": "Invalid address"
 }
 ```
 
-## 🚀 Deployment
+## Deployment
 
-### Vercel (Recommended)
+### Vercel
 
-1. Push your code to GitHub
-2. Import project to Vercel
-3. Add `FAUCET_PRIVATE_KEY` environment variable
-4. Deploy!
+1. Push the code to a Git repository.
+2. Import the project in the Vercel dashboard.
+3. Configure the FAUCET_PRIVATE_KEY environment variable.
+4. Deploy the application.
 
-## 🤝 Contributing
+## Contribution
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are accepted via Pull Requests. Ensure code consistency and test coverage before submission.
 
-## 📄 License
+## License
 
-MIT License - feel free to use this project for your own faucet!
+MIT License.
 
-## 👨‍💻 Built By
+## Maintenance
 
-Created by [enliven](https://github.com/enliven17)
+Maintained by [enliven](https://github.com/enliven17)
 
-## 🔗 Links
+## Resources
 
-- [Creditcoin Docs](https://docs.creditcoin.org/)
+- [Creditcoin Documentation](https://docs.creditcoin.org/)
 - [Creditcoin Testnet Explorer](https://creditcoin-testnet.blockscout.com/)
-- [Next.js Documentation](https://nextjs.org/docs)
+- [Next.js Reference](https://nextjs.org/docs)
 
 ---
 
-Made with ❤️ for the Creditcoin community
+Developed for the Creditcoin community.
